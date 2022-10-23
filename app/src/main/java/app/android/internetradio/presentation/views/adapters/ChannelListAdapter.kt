@@ -18,7 +18,7 @@ class ChannelListAdapter(var channelList: List<ChannelViewData>) :
 
     fun updateList(updatedList: List<ChannelViewData>) {
         channelList = updatedList
-        notifyDataSetChanged()
+        this.notifyDataSetChanged()
     }
 
     class ChannelListViewHolder(view: View) : RecyclerView.ViewHolder(view) {
