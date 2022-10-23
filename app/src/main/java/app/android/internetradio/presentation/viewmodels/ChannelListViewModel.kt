@@ -36,14 +36,11 @@ class ChannelListViewModel @Inject constructor(val useCase: UseCase<List<Channel
         }
     }
 
-    fun getChannelListData() {
+    fun getChannelListData() : List<ChannelViewData> {
         if(listData.isEmpty()) {
             fetchChannelList()
-        } else {
-            viewModelScope.launch {
-                _channelListFlow.emit(listData)
-            }
         }
+        return listData
     }
 
     fun filterByDJ(dj: String) : List<ChannelViewData> {

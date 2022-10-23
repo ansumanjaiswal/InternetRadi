@@ -44,7 +44,6 @@ class ChannelListActivity : AppCompatActivity() {
             }
         }
 
-        //viewModel.fetchChannelList()
         viewModel.getChannelListData()
 
         binding.find.setOnClickListener {
@@ -56,7 +55,7 @@ class ChannelListActivity : AppCompatActivity() {
 
         binding.reset.setOnClickListener {
             binding.searchView.text.clear()
-            viewModel.getChannelListData()
+            adapter.updateList(viewModel.getChannelListData())
         }
     }
 }
