@@ -5,11 +5,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.recyclerview.widget.RecyclerView
 import app.android.internetradio.R
 import app.android.internetradio.data.view.ChannelViewData
+import app.android.internetradio.loadImage
 import app.android.internetradio.presentation.views.activities.ChannelDetailsActivity
 import com.bumptech.glide.Glide
 
@@ -36,7 +38,8 @@ class ChannelListAdapter(var channelList: List<ChannelViewData>) :
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChannelListViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.channel_list_item, parent, false)
+        val view =
+            LayoutInflater.from(parent.context).inflate(R.layout.channel_list_item, parent, false)
         return ChannelListViewHolder(view)
     }
 
@@ -44,19 +47,27 @@ class ChannelListAdapter(var channelList: List<ChannelViewData>) :
         holder.title.text = channelList[position].title
         holder.description.text = channelList[position].description
         holder.dj.text = channelList[position].dj
-        Glide
-            .with(holder.itemView.context)
-            .load(channelList[position].iconUrl)
-            .centerCrop()
-            .placeholder(R.drawable.radio_default_image)
-            .into(holder.icon)
+        // Created and extension function for imageview to load m=image from url
+        // Provides ease of use,
+        // and could be handy if we ever want to switch the library providing image loading
+        holder.icon.loadImage(channelList[position].iconUrl, R.drawable.radio_default_image)
+
+        // A better way of handling click is to pass an interface to the adapter
+        // and invoke the interface method on click, and handle the logic of click separately
+
+        // I would also not directly pass data to the activity,
+        // but pass the id to the data object the needs to be shown to the activity
+        // and let the viewModel of the details activity fetch the data and load the details
+
+        // Another way to do this is having the details view as a fragment,
+        // and that way the fragment can share the ViewModel and load the details view
+
         holder.itemView.setOnClickListener {
             val intent = Intent(it.context, ChannelDetailsActivity::class.java)
             val bundle = Bundle()
             bundle.putParcelable("channelData", channelList[position])
             intent.putExtras(bundle)
             it.context.startActivity(intent)
-            //Toast.makeText(it.context, "CLICKED ${channelList[position].title}", Toast.LENGTH_LONG).show()
         }
 
     }

@@ -5,9 +5,9 @@ import androidx.appcompat.app.AppCompatActivity
 import app.android.internetradio.R
 import app.android.internetradio.data.view.ChannelViewData
 import app.android.internetradio.databinding.ActivityChannelDetailsBinding
-import com.bumptech.glide.Glide
+import app.android.internetradio.loadImage
 
-class ChannelDetailsActivity: AppCompatActivity() {
+class ChannelDetailsActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityChannelDetailsBinding
     private var data: ChannelViewData? = null
@@ -20,19 +20,13 @@ class ChannelDetailsActivity: AppCompatActivity() {
         setContentView(binding.root)
         data = intent.getParcelableExtra("channelData")
 
-        if(data != null) {
+        if (data != null) {
             binding.title.text = data?.title
             binding.dj.text = data?.dj
             binding.djEmail.text = data?.djMail
             binding.numberOfListeners.text = data?.listeners
             binding.genre.text = data?.genre
-
-            Glide
-                .with(this)
-                .load(data?.largeImageUrl)
-                .centerCrop()
-                .placeholder(R.drawable.radio_default_image)
-                .into(binding.icon)
+            binding.icon.loadImage(data?.largeImageUrl.orEmpty(), R.drawable.radio_default_image)
         }
 
     }

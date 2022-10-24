@@ -30,6 +30,20 @@ class ChannelListActivity : AppCompatActivity() {
         setContentView(binding.root)
         binding.recyclerView.adapter = adapter
 
+        observeDataFetchProgress()
+
+        observeChannelListData()
+
+        handleFindButtonClick()
+
+        handleResetButtonClick()
+
+        observeErrorState()
+
+        viewModel.getChannelListData()
+    }
+
+    private fun observeDataFetchProgress() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.progressBarVisibility.collect {
@@ -37,34 +51,49 @@ class ChannelListActivity : AppCompatActivity() {
                 }
             }
         }
+    }
 
+    private fun observeChannelListData() {
         lifecycleScope.launchWhenStarted {
             viewModel.channelListFlow.collect {
                 adapter.updateList(it)
             }
         }
+    }
 
-        viewModel.getChannelListData()
-
+    private fun handleFindButtonClick() {
         binding.find.setOnClickListener {
             lifecycleScope.launchWhenCreated {
                 val filterList = viewModel.filterByDJ(binding.searchView.text.toString())
                 adapter.updateList(filterList)
             }
         }
+    }
 
+    private fun handleResetButtonClick() {
         binding.reset.setOnClickListener {
             binding.searchView.text.clear()
             adapter.updateList(viewModel.getChannelListData())
         }
     }
-}
 
-/*
-fun <T> AppCompatActivity.collectLifecycleFlow(flow: Flow<T>, collect: suspend(T) -> Unit) {
-    lifecycleScope.launch {
-        repeatOnLifecycle(Lifecycle.State.STARTED) {
-            flow.collect(collect)
+    private fun observeErrorState() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.CREATED) {
+                viewModel.errorMessage.collect {
+                    binding.errorText.visibility = View.VISIBLE
+                    binding.errorText.text = it
+                }
+            }
+        }
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.CREATED) {
+                viewModel.errorMessageVisibility.collect {
+                    binding.errorText.visibility = it
+                }
+            }
         }
     }
-}*/
+}
+

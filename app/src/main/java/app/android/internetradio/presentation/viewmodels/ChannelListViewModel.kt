@@ -22,16 +22,31 @@ class ChannelListViewModel @Inject constructor(val useCase: UseCase<List<Channel
     private val _progressBarVisibility = MutableStateFlow(View.VISIBLE)
     val progressBarVisibility = _progressBarVisibility.asStateFlow()
 
+    private val _errorMessageVisibility = MutableStateFlow(View.GONE)
+    val errorMessageVisibility = _errorMessageVisibility.asStateFlow()
+
+    private val _errorMessage = MutableStateFlow("")
+    val errorMessage = _errorMessage.asStateFlow()
+
+    // This can be persisted in a in memory cache or in sqlite db based on the business requirement
+    // For the current project and in the interest of time keeping it local to ViewModel, to avoid reaching network every time
     private var listData: List<ChannelViewData> = emptyList()
 
     private fun fetchChannelList() {
         viewModelScope.launch(Dispatchers.IO) {
             _progressBarVisibility.emit(View.VISIBLE)
+            _errorMessageVisibility.emit(View.GONE)
             listData = useCase.getData()
 
             withContext(Dispatchers.Main) {
+                if(listData.isEmpty()) {
+                    val errorMessage = "Error in retrieving data. Please try again in sometime"
+                    _errorMessageVisibility.emit(View.VISIBLE)
+                    _errorMessage.emit(errorMessage)
+                }
                 _progressBarVisibility.emit(View.GONE)
                 _channelListFlow.emit(listData)
+
             }
         }
     }
